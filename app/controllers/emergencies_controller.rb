@@ -2,8 +2,6 @@ class EmergenciesController < ApplicationController
   respond_to :json
   before_action :reject_unpermitted_parameters, only: [:create, :update]
 
-  rescue_from ActiveRecord::RecordNotFound, with: :page_not_found
-
   def index
     @emergencies = Emergency.all
   end
