@@ -16,7 +16,7 @@ class EmergenciesController < ApplicationController
       render 'show', status: :ok
     else
       @messages = @emergency.errors
-      render 'messages', status: :unprocessable_entity
+      render 'shared/messages', status: :unprocessable_entity
     end
   end
 
@@ -26,7 +26,7 @@ class EmergenciesController < ApplicationController
       render 'show', status: :ok
     else
       @messages = @emergency.errors
-      render 'messages, status: unprocessable_entity'
+      render 'shared/messages', status: unprocessable_entity
     end
   end
 
@@ -44,15 +44,6 @@ class EmergenciesController < ApplicationController
                                         :fire_severity, 
                                         :medical_severity,
                                         :resolved_at)
-    end
-
-    def reject_unpermitted_parameters
-      unpermitted_parameters.each do |parameter|
-        if params[:emergency].has_key?(parameter)
-          @messages = "found unpermitted parameter: #{parameter.to_s}"
-          render 'messages', status: :unprocessable_entity
-        end
-      end
     end
 
     def unpermitted_parameters
