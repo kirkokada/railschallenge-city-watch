@@ -1,8 +1,12 @@
 class EmergenciesController < ApplicationController
   respond_to :json
-  before_action :reject_unpermitted_parameters, only: :create
+  before_action :reject_unpermitted_parameters, only: [:create, :update]
 
   rescue_from ActiveRecord::RecordNotFound, with: :page_not_found
+
+  def index
+    @emergencies = Emergency.all
+  end
 
   def show
     @emergency = Emergency.find_by!(code: params[:id])
@@ -18,6 +22,16 @@ class EmergenciesController < ApplicationController
     end
   end
 
+  def update
+    @emergency = Emergency.find_by!(code: params[:id])
+    if @emergency.update_attributes(emergency_params)
+      render 'show', status: :ok
+    else
+      @messages = @emergency.errors
+      render 'messages, status: unprocessable_entity'
+    end
+  end
+
   def destroy
     emergency = Emergency.find(code: params[:id])
 
@@ -30,7 +44,8 @@ class EmergenciesController < ApplicationController
       params.require(:emergency).permit(:code, 
                                         :police_severity, 
                                         :fire_severity, 
-                                        :medical_severity)
+                                        :medical_severity,
+                                        :resolved_at)
     end
 
     def reject_unpermitted_parameters
@@ -43,6 +58,12 @@ class EmergenciesController < ApplicationController
     end
 
     def unpermitted_parameters
-      [:id, :resolved_at]
+      if params[:action] == 'create'
+        [:id, :resolved_at]
+      elsif params[:action] == 'update'
+        [:id, :code]
+      else
+        []
+      end
     end
 end
