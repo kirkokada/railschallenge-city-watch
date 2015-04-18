@@ -38,21 +38,21 @@ class EmergenciesController < ApplicationController
 
   private
 
-    def emergency_params
-      params.require(:emergency).permit(:code, 
-                                        :police_severity, 
-                                        :fire_severity, 
-                                        :medical_severity,
-                                        :resolved_at)
-    end
+  def emergency_params
+    params.require(:emergency).permit(:code,
+                                      :police_severity,
+                                      :fire_severity,
+                                      :medical_severity,
+                                      :resolved_at)
+  end
 
-    def unpermitted_parameters
-      if params[:action] == 'create'
-        [:id, :resolved_at]
-      elsif params[:action] == 'update'
-        [:id, :code]
-      else
-        []
-      end
+  def unpermitted_parameters
+    if params[:action] == 'create'
+      [:id, :resolved_at]
+    elsif params[:action] == 'update'
+      [:id, :code]
+    else
+      []
     end
+  end
 end

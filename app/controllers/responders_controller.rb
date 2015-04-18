@@ -1,6 +1,10 @@
 class RespondersController < ApplicationController
   before_action :reject_unpermitted_parameters, only: [:create, :update]
 
+  def index
+    @responders = Responder.all
+  end
+
   def show
     @responder = Responder.find_by!(name: params[:id])
   end
@@ -10,8 +14,16 @@ class RespondersController < ApplicationController
     if @responder.save
       render 'show', status: :ok
     else
-      @messages = @responder.errors
-      render 'shared/messages', status: :unprocessable_entity
+      render_errors_for @responder
+    end
+  end
+
+  def update
+    @responder = Responder.find_by!(name: params[:id])
+    if @responder.update_attributes(responder_params)
+      render 'show', status: :ok
+    else
+      render_errors_for @responder
     end
   end
 
@@ -21,21 +33,20 @@ class RespondersController < ApplicationController
 
   private
 
-    def responder_params
-      params.require(:responder).permit(:name, 
-                                        :type, 
-                                        :emergency_code,
-                                        :capacity,
-                                        :on_duty)
-    end
+  def responder_params
+    params.require(:responder).permit(:name,
+                                      :type,
+                                      :capacity,
+                                      :on_duty)
+  end
 
-    def unpermitted_parameters
-      if params[:action] == 'create'
-        [:id, :emergency_code, :on_duty]
-      elsif params[:action] == 'update'
-        [:id]
-      else
-        []
-      end
+  def unpermitted_parameters
+    if params[:action] == 'create'
+      [:id, :emergency_code, :on_duty]
+    elsif params[:action] == 'update'
+      [:id, :capacity, :emergency_code, :type, :name]
+    else
+      []
     end
+  end
 end

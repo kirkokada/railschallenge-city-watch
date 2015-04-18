@@ -7,7 +7,6 @@ class Responder < ActiveRecord::Base
                    uniqueness: { case_sensitive: false }
   validates :type, presence: true
 
-
   def to_params
     name
   end
