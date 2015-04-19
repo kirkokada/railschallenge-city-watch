@@ -1,8 +1,6 @@
 class Responder < ActiveRecord::Base
   self.inheritance_column = 'inherits_from'
 
-  RESPONDER_TYPES = ['Fire', 'Medical', 'Police']
-
   validates :capacity, presence: true,
                        inclusion: { in: 1..5 }
   validates :name, presence: true,
@@ -14,16 +12,20 @@ class Responder < ActiveRecord::Base
   scope :on_duty, -> { where on_duty: true }
 
   def self.emergency_capacities
-    capacities = Hash.new
-    RESPONDER_TYPES.each do |t|
-      responders = Responder.of_type(t)
-      capacities[t] = []
-      capacities[t] << capacity_of(responders)
-      capacities[t] << capacity_of(responders.available)
-      capacities[t] << capacity_of(responders.on_duty)
-      capacities[t] << capacity_of(responders.available.on_duty)
+    capacities = {}
+    Responder.uniq.pluck(:type).each do |t|
+      capacities[t] = capacities_for(t)
     end
-    return capacities
+    capacities
+  end
+
+  def self.capacities_for(type)
+    capacities = []
+    responders = Responder.of_type(type)
+    capacities << capacity_of(responders)
+    capacities << capacity_of(responders.available)
+    capacities << capacity_of(responders.on_duty)
+    capacities << capacity_of(responders.available.on_duty)
   end
 
   def self.capacity_of(responders)
