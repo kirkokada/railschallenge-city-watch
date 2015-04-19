@@ -2,7 +2,12 @@ class RespondersController < ApplicationController
   before_action :reject_unpermitted_parameters, only: [:create, :update]
 
   def index
-    @responders = Responder.all
+    if params[:show] == "capacity"
+      @capacities = Responder.emergency_capacities
+      render 'capacities'
+    else
+      @responders = Responder.all
+    end
   end
 
   def show
