@@ -31,12 +31,6 @@ class EmergenciesController < ApplicationController
     end
   end
 
-  def destroy
-    emergency = Emergency.find_by!(code: params[:id])
-
-    emergency.destroy if emergency
-  end
-
   private
 
   def emergency_params

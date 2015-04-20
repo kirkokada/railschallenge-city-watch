@@ -32,10 +32,6 @@ class RespondersController < ApplicationController
     end
   end
 
-  def destroy
-    @responder = Responder.find_by!(name: params[:id])
-  end
-
   private
 
   def responder_params
