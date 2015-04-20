@@ -13,6 +13,7 @@ class EmergenciesController < ApplicationController
   def create
     @emergency = Emergency.new(emergency_params)
     if @emergency.save
+      Responder.dispatch_to(@emergency)
       render 'show', status: :ok
     else
       @messages = @emergency.errors
