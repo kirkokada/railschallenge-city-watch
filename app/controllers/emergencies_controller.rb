@@ -14,7 +14,7 @@ class EmergenciesController < ApplicationController
     @emergency = Emergency.new(emergency_params)
     if @emergency.save
       Responder.dispatch_to(@emergency)
-      render 'show', status: :ok
+      render 'show', status: :created
     else
       @messages = @emergency.errors
       render 'shared/messages', status: :unprocessable_entity
