@@ -13,8 +13,21 @@ class Responder < ActiveRecord::Base
   scope :available,   -> { on_duty.unassigned }
   scope :appropriate, -> (severity) { order("abs(capacity - #{severity}) asc") }
 
-  def self.allocate_responders(type, severity)
-    
+  # Class methods
+
+  def self.allocate_responders(type, severity, code)
+    all_responders = of_type(type).available
+    if capacity_of(all_responders) < severity
+      all_responders.find_each { |responder| responder.assign_code(code) }
+      return false
+    else
+      while severity > 0
+        responder = all_responders.appropriate(severity).first
+        responder.assign_code(code)
+        severity -= responder.capacity
+      end
+      return true
+    end
   end
 
   def self.capacities_for(type)
@@ -23,7 +36,7 @@ class Responder < ActiveRecord::Base
     capacities << capacity_of(responders)
     capacities << capacity_of(responders.unassigned)
     capacities << capacity_of(responders.on_duty)
-    capacities << capacity_of(responders.unassigned.on_duty)
+    capacities << capacity_of(responders.available)
   end
 
   def self.capacity_of(responders)
@@ -31,24 +44,12 @@ class Responder < ActiveRecord::Base
   end
 
   def self.dispatch_to(emergency)
+    responses = []
     responder_types.each do |type|
       severity = emergency.send(type.downcase + '_severity')
-      if severity > 0
-        all_responders = of_type(type).available
-        if capacity_of(all_responders) < severity
-          all_responders.find_each { |responder| responder.assign_to(emergency) }
-        else
-          while severity > 0
-            responder = all_responders.appropriate(severity).first
-            responder.assign_to(emergency)
-            severity -= responder.capacity
-          end
-          emergency.confirm_full_response
-        end
-      else
-        emergency.confirm_full_response
-      end
+      responses << allocate_responders(type, severity, emergency.code)
     end
+    emergency.confirm_full_response if responses.all?
   end
 
   def self.emergency_capacities
@@ -63,8 +64,10 @@ class Responder < ActiveRecord::Base
     Responder.uniq.pluck(:type)
   end
 
-  def assign_to(emergency)
-    update_attribute(:emergency_code, emergency.code)
+  # Instance Methods
+
+  def assign_code(code)
+    update_attribute(:emergency_code, code)
   end
 
   def dismiss
