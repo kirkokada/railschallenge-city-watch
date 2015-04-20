@@ -32,7 +32,7 @@ class EmergenciesController < ApplicationController
   end
 
   def destroy
-    emergency = Emergency.find(code: params[:id])
+    emergency = Emergency.find_by!(code: params[:id])
 
     emergency.destroy if emergency
   end

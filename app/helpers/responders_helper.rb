@@ -1,2 +1,0 @@
-module RespondersHelper
-end
