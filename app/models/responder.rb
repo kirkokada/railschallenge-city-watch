@@ -12,22 +12,29 @@ class Responder < ActiveRecord::Base
   scope :on_duty,     -> { where(on_duty: true) }
   scope :available,   -> { on_duty.unassigned }
   scope :appropriate, -> (severity) { order("abs(capacity - #{severity}) asc") }
+  scope :capable, -> (severity) { where('capacity >= ?', severity) }
 
   # Class methods
 
   def self.allocate_responders(type, severity, code)
-    all_responders = of_type(type).available
-    if capacity_of(all_responders) < severity
-      all_responders.find_each { |responder| responder.assign_code(code) }
+    responders = of_type(type).available
+    if capacity_of(responders) < severity
+      responders.find_each { |responder| responder.assign_code(code) }
       return false
+    elsif responders.capable(severity).any?
+      assign_responders(responders.capable(severity), severity, code)
     else
-      while severity > 0
-        responder = all_responders.appropriate(severity).first
-        responder.assign_code(code)
-        severity -= responder.capacity
-      end
-      return true
+      assign_responders(responders, severity, code)
     end
+  end
+
+  def self.assign_responders(responders, severity, code)
+    while severity > 0
+      responder = responders.appropriate(severity).first
+      responder.assign_code(code)
+      severity -= responder.capacity
+    end
+    true
   end
 
   def self.capacities_for(type)
