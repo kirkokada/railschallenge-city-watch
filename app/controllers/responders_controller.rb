@@ -44,13 +44,15 @@ class RespondersController < ApplicationController
                                       :on_duty)
   end
 
-  def unpermitted_parameters
-    if params[:action] == 'create'
-      [:id, :emergency_code, :on_duty]
-    elsif params[:action] == 'update'
-      [:id, :capacity, :emergency_code, :type, :name]
-    else
-      []
-    end
+  def unpermitted_create_params
+    @unpermitted_create_params ||= [:id, :emergency_code, :on_duty]
+  end
+
+  def unpermitted_update_params
+    @unpermitted_update_params ||= [:id,
+                                    :capacity,
+                                    :name,
+                                    :type,
+                                    :emergency_code]
   end
 end

@@ -1,5 +1,6 @@
 class EmergenciesController < ApplicationController
   respond_to :json
+
   before_action :reject_unpermitted_parameters, only: [:create, :update]
   before_action :find_emergency, only: [:show, :update]
 
@@ -44,13 +45,11 @@ class EmergenciesController < ApplicationController
                                       :resolved_at)
   end
 
-  def unpermitted_parameters
-    if params[:action] == 'create'
-      [:id, :resolved_at]
-    elsif params[:action] == 'update'
-      [:id, :code]
-    else
-      []
-    end
+  def unpermitted_create_params
+    @unpermitted_create_params ||= [:id, :resolved_at]
+  end
+
+  def unpermitted_update_params
+    @unpermitted_update_params ||= [:id, :code]
   end
 end

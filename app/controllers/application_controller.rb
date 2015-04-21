@@ -21,7 +21,21 @@ class ApplicationController < ActionController::Base
   # Define in resource controller
 
   def unpermitted_parameters
-    fail 'Define me!'
+    if params[:action] == 'create'
+      unpermitted_create_params
+    elsif params[:action] == 'update'
+      unpermitted_update_params
+    else
+      []
+    end
+  end
+
+  def unpermitted_create_params
+    fail 'Define me'
+  end
+
+  def unpermitted_update_params
+    fail 'Define me'
   end
 
   def render_errors_for(resource)

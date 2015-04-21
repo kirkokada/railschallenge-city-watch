@@ -54,11 +54,9 @@ class Responder < ActiveRecord::Base
     update_attribute(:emergency_code, code)
   end
 
-  private
-
   def self.allocate_responders(type, severity, code)
     best_responder = most_appropriate_for(type, severity)
-    unless best_responder.nil?
+    if best_responder
       best_responder.assign_code(code)
       return true
     else
@@ -67,10 +65,10 @@ class Responder < ActiveRecord::Base
   end
 
   def self.assign_responders(type, severity, code)
-    responders = of_type(type).available
+    responders = of_type(type).available.appropriate(severity).to_a
     while severity > 0
       return false unless responders.any?
-      responder = responders.appropriate(severity).first
+      responder = responders.slice!(0)
       responder.assign_code(code)
       severity -= responder.capacity
     end
