@@ -1,18 +1,20 @@
 class Responder < ActiveRecord::Base
   self.inheritance_column = 'inherits_from'
 
+  RESPONDER_TYPES = %w(Fire Medical Police)
+
   validates :capacity, presence: true,
                        inclusion: { in: 1..5 }
   validates :name, presence: true,
                    uniqueness: { case_sensitive: false }
   validates :type, presence: true
 
-  scope :of_type,     -> (type) { where(type: type) }
-  scope :unassigned,  -> { where(emergency_code: nil) }
-  scope :on_duty,     -> { where(on_duty: true) }
-  scope :available,   -> { on_duty.unassigned }
+  scope :of_type,     -> (type)     { where(type: type) }
+  scope :unassigned,  ->            { where(emergency_code: nil) }
+  scope :on_duty,     ->            { where(on_duty: true) }
+  scope :available,   ->            { on_duty.unassigned }
   scope :appropriate, -> (severity) { order("abs(capacity - #{severity}) asc") }
-  scope :capable, -> (severity) { where('capacity >= ?', severity) }
+  scope :capable,     -> (severity) { where('capacity >= ?', severity) }
 
   # Class methods
 
@@ -52,7 +54,7 @@ class Responder < ActiveRecord::Base
 
   def self.dispatch_to(emergency)
     responses = []
-    responder_types.each do |type|
+    RESPONDER_TYPES.each do |type|
       severity = emergency.send(type.downcase + '_severity')
       responses << allocate_responders(type, severity, emergency.code)
     end
@@ -61,14 +63,10 @@ class Responder < ActiveRecord::Base
 
   def self.emergency_capacities
     capacities = {}
-    responder_types.each do |type|
+    RESPONDER_TYPES.each do |type|
       capacities[type] = capacities_for(type)
     end
     capacities
-  end
-
-  def self.responder_types
-    Responder.uniq.pluck(:type)
   end
 
   # Instance Methods
