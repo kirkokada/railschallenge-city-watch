@@ -11,7 +11,7 @@ class RespondersController < ApplicationController
   end
 
   def show
-    @responder = Responder.find_by!(name: params[:id])
+    @responder = Responder.find_by_name!(params[:id])
   end
 
   def create
@@ -24,7 +24,7 @@ class RespondersController < ApplicationController
   end
 
   def update
-    @responder = Responder.find_by!(name: params[:id])
+    @responder = Responder.find_by_name!(params[:id])
     if @responder.update_attributes(responder_params)
       render 'show', status: :ok
     else
@@ -33,6 +33,10 @@ class RespondersController < ApplicationController
   end
 
   private
+
+  def find_responder
+    @responder = Responder.find_by_name!(params[:id])
+  end
 
   def responder_params
     params.require(:responder).permit(:name,
