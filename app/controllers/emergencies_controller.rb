@@ -1,13 +1,14 @@
 class EmergenciesController < ApplicationController
   respond_to :json
   before_action :reject_unpermitted_parameters, only: [:create, :update]
+  before_action :find_emergency, only: [:show, :update]
 
   def index
     @emergencies = Emergency.all
   end
 
   def show
-    @emergency = Emergency.find_by!(code: params[:id])
+
   end
 
   def create
@@ -22,7 +23,6 @@ class EmergenciesController < ApplicationController
   end
 
   def update
-    @emergency = Emergency.find_by!(code: params[:id])
     if @emergency.update_attributes(emergency_params)
       render 'show', status: :ok
     else
@@ -32,6 +32,10 @@ class EmergenciesController < ApplicationController
   end
 
   private
+
+  def find_emergency
+    @emergency = Emergency.find_by_code!(params[:id])
+  end
 
   def emergency_params
     params.require(:emergency).permit(:code,

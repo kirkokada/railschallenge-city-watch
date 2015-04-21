@@ -1,5 +1,6 @@
 class RespondersController < ApplicationController
   before_action :reject_unpermitted_parameters, only: [:create, :update]
+  before_action :find_responder, only: [:show, :update]
 
   def index
     if params[:show] == 'capacity'
@@ -11,7 +12,7 @@ class RespondersController < ApplicationController
   end
 
   def show
-    @responder = Responder.find_by_name!(params[:id])
+
   end
 
   def create
@@ -24,7 +25,6 @@ class RespondersController < ApplicationController
   end
 
   def update
-    @responder = Responder.find_by_name!(params[:id])
     if @responder.update_attributes(responder_params)
       render 'show', status: :ok
     else
