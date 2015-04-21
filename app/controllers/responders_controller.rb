@@ -12,7 +12,6 @@ class RespondersController < ApplicationController
   end
 
   def show
-
   end
 
   def create
@@ -26,7 +25,7 @@ class RespondersController < ApplicationController
 
   def update
     if @responder.update_attributes(responder_params)
-      render 'show', status: :ok
+      render 'show'
     else
       render_errors_for @responder
     end

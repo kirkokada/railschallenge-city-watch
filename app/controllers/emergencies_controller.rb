@@ -8,7 +8,6 @@ class EmergenciesController < ApplicationController
   end
 
   def show
-
   end
 
   def create
@@ -24,10 +23,10 @@ class EmergenciesController < ApplicationController
 
   def update
     if @emergency.update_attributes(emergency_params)
-      render 'show', status: :ok
+      render 'show'
     else
       @messages = @emergency.errors
-      render 'shared/messages', status: unprocessable_entity
+      render 'shared/messages', status: :unprocessable_entity
     end
   end
 
