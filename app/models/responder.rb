@@ -14,17 +14,14 @@ class Responder < ActiveRecord::Base
   scope :on_duty,     ->            { where(on_duty: true) }
   scope :available,   ->            { on_duty.unassigned }
   scope :appropriate, -> (severity) { order("abs(capacity - #{severity}) asc") }
-  scope :capable,     -> (severity) { where('capacity >= ?', severity) }
+  scope :capable_of,  -> (severity) { where('capacity >= ?', severity) }
 
   # Class methods
 
   def self.allocate_responders(type, severity, code)
     responders = of_type(type).available
-    if capacity_of(responders) < severity
-      responders.find_each { |responder| responder.assign_code(code) }
-      return false
-    elsif responders.capable(severity).any?
-      assign_responders(responders.capable(severity), severity, code)
+    if responders.capable_of(severity).any?
+      assign_responders(responders.capable_of(severity), severity, code)
     else
       assign_responders(responders, severity, code)
     end
@@ -32,6 +29,7 @@ class Responder < ActiveRecord::Base
 
   def self.assign_responders(responders, severity, code)
     while severity > 0
+      return false if responders.empty?
       responder = responders.appropriate(severity).first
       responder.assign_code(code)
       severity -= responder.capacity
@@ -55,7 +53,7 @@ class Responder < ActiveRecord::Base
   def self.dispatch_to(emergency)
     responses = []
     RESPONDER_TYPES.each do |type|
-      severity = emergency.send(type.downcase + '_severity')
+      severity = emergency.send("#{type.downcase}_severity")
       responses << allocate_responders(type, severity, emergency.code)
     end
     emergency.confirm_full_response if responses.all?
