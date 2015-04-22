@@ -1,7 +1,6 @@
 class EmergenciesController < ApplicationController
   respond_to :json
 
-  before_action :reject_unpermitted_parameters, only: [:create, :update]
   before_action :find_emergency, only: [:show, :update]
 
   def index
@@ -12,22 +11,20 @@ class EmergenciesController < ApplicationController
   end
 
   def create
-    @emergency = Emergency.new(emergency_params)
+    @emergency = Emergency.new(emergency_create_params)
     if @emergency.save
       Responder.dispatch_to(@emergency)
       render 'show', status: :created
     else
-      @messages = @emergency.errors
-      render 'shared/messages', status: :unprocessable_entity
+      render_errors_for @emergency
     end
   end
 
   def update
-    if @emergency.update_attributes(emergency_params)
+    if @emergency.update_attributes(emergency_update_params)
       render 'show'
     else
-      @messages = @emergency.errors
-      render 'shared/messages', status: :unprocessable_entity
+      render_errors_for @emergency
     end
   end
 
@@ -37,19 +34,17 @@ class EmergenciesController < ApplicationController
     @emergency = Emergency.find_by_code!(params[:id])
   end
 
-  def emergency_params
+  def emergency_create_params
     params.require(:emergency).permit(:code,
                                       :police_severity,
                                       :fire_severity,
+                                      :medical_severity)
+  end
+
+  def emergency_update_params
+    params.require(:emergency).permit(:police_severity,
+                                      :fire_severity,
                                       :medical_severity,
                                       :resolved_at)
-  end
-
-  def unpermitted_create_params
-    @unpermitted_create_params ||= [:id, :resolved_at]
-  end
-
-  def unpermitted_update_params
-    @unpermitted_update_params ||= [:id, :code]
   end
 end
