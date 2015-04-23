@@ -7,8 +7,6 @@ class Emergency < ActiveRecord::Base
 
   has_many :responders, foreign_key: :emergency_code, primary_key: :code
 
-  scope :full_responses, -> { where(full_response: true) }
-
   #
   # Wrapper method to set full_respons to true.
   #
