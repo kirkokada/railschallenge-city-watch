@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
     render json: { message: exception.message }, status: :unprocessable_entity
   end
 
+  def catch_404
+    fail ActionController::RoutingError.new(params[:path]), 'page not found'
+  end
+
   private
 
   def page_not_found
