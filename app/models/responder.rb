@@ -42,10 +42,6 @@ class Responder < ActiveRecord::Base
     capacities
   end
 
-  def dismiss
-    update_attribute(:emergency_code, nil)
-  end
-
   def to_params
     name
   end

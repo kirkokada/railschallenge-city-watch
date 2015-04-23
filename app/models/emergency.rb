@@ -8,12 +8,14 @@ class Emergency < ActiveRecord::Base
   validates :medical_severity, presence: true,
                                numericality: { greater_than_or_equal_to: 0 }
 
+  has_many :responders, foreign_key: :emergency_code, primary_key: :code
+
   after_update :dismiss_responders
 
   scope :full_responses, -> { where(full_response: true) }
 
-  def responders
-    Responder.where(emergency_code: code).pluck(:name)
+  def responder_names
+    responders.pluck(:name)
   end
 
   def confirm_full_response
@@ -28,6 +30,6 @@ class Emergency < ActiveRecord::Base
 
   def dismiss_responders
     return unless resolved_at && resolved_at < Time.zone.now
-    Responder.where(emergency_code: code).find_each(&:dismiss)
+    responders.clear
   end
 end
