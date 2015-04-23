@@ -3,8 +3,8 @@ class EmergenciesController < ApplicationController
 
   def index
     @emergencies = Emergency.all
-    @full_responses = [Emergency.where(full_response: true).count,
-                       Emergency.count]
+    @full_responses = [@emergencies.where(full_response: true).size,
+                       @emergencies.size]
   end
 
   def show
