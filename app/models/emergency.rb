@@ -10,26 +10,26 @@ class Emergency < ActiveRecord::Base
 
   has_many :responders, foreign_key: :emergency_code, primary_key: :code
 
-  after_update :dismiss_responders
-
   scope :full_responses, -> { where(full_response: true) }
 
-  def responder_names
-    responders.pluck(:name)
-  end
-
+  #
+  # Wrapper method to set full_respons to true.
+  #
   def confirm_full_response
     update_attribute(:full_response, true)
   end
 
-  def to_param
-    code
+  #
+  # Returns an array of responders assigned to the emergency instance.
+  #
+  def responder_names
+    responders.pluck(:name)
   end
 
-  private
-
+  #
+  # Removes all responder relations if the emergency is resolved
+  #
   def dismiss_responders
-    return unless resolved_at && resolved_at < Time.zone.now
-    responders.clear
+    responders.clear if resolved_at && resolved_at < Time.zone.now
   end
 end

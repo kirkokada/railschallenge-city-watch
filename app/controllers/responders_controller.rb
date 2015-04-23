@@ -1,6 +1,4 @@
 class RespondersController < ApplicationController
-  before_action :find_responder, only: [:show, :update]
-
   def index
     if params[:show] == 'capacity'
       @capacity = Responder.emergency_capacities
@@ -11,6 +9,7 @@ class RespondersController < ApplicationController
   end
 
   def show
+    find_responder
   end
 
   def create
@@ -23,6 +22,7 @@ class RespondersController < ApplicationController
   end
 
   def update
+    find_responder
     if @responder.update_attributes(responder_update_params)
       render 'show'
     else

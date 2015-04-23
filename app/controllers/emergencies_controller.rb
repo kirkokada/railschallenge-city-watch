@@ -1,13 +1,12 @@
 class EmergenciesController < ApplicationController
   respond_to :json
 
-  before_action :find_emergency, only: [:show, :update]
-
   def index
     @emergencies = Emergency.all
   end
 
   def show
+    find_emergency
   end
 
   def create
@@ -21,7 +20,9 @@ class EmergenciesController < ApplicationController
   end
 
   def update
+    find_emergency
     if @emergency.update_attributes(emergency_update_params)
+      @emergency.dismiss_responders
       render 'show'
     else
       render_errors_for @emergency
