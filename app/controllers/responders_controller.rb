@@ -15,7 +15,7 @@ class RespondersController < ApplicationController
   def create
     @responder = Responder.new(responder_create_params)
     if @responder.save
-      render 'show', status: :created
+      render :show, status: :created
     else
       render_errors_for @responder
     end
@@ -24,7 +24,7 @@ class RespondersController < ApplicationController
   def update
     find_responder
     if @responder.update_attributes(responder_update_params)
-      render 'show'
+      render :show
     else
       render_errors_for @responder
     end

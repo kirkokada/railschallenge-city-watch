@@ -13,7 +13,7 @@ class EmergenciesController < ApplicationController
     @emergency = Emergency.new(emergency_create_params)
     if @emergency.save
       Responder.dispatch_to(@emergency)
-      render 'show', status: :created
+      render :show, status: :created
     else
       render_errors_for @emergency
     end
@@ -23,7 +23,7 @@ class EmergenciesController < ApplicationController
     find_emergency
     if @emergency.update_attributes(emergency_update_params)
       @emergency.dismiss_responders
-      render 'show'
+      render :show
     else
       render_errors_for @emergency
     end
