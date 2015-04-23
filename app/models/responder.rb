@@ -1,5 +1,5 @@
 class Responder < ActiveRecord::Base
-  self.inheritance_column = 'inherits_from'
+  self.inheritance_column = :_type
 
   RESPONDER_TYPES = %w(Fire Medical Police)
 
