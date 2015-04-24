@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: emergencies
+#
+#  id               :integer          not null, primary key
+#  code             :string           not null
+#  fire_severity    :integer          not null
+#  police_severity  :integer          not null
+#  medical_severity :integer          not null
+#  resolved_at      :time
+#  full_response    :boolean          default(FALSE)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#
+
 class Emergency < ActiveRecord::Base
   validates :code, presence: true,
                    uniqueness: { case_sensitive: false }

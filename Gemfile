@@ -7,6 +7,8 @@ gem 'jbuilder', '~> 2.0'
 
 gem 'responders', '~> 2.0'
 
+gem 'annotate', '~> 2.6.6'
+
 group :development, :test do
   gem 'rubocop', '0.30.0'
   gem 'minitest-rails', '~> 2.1.1'
